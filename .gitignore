@@ -135,5 +135,17 @@ models/*.h5
 # Alembic local config
 alembic.ini.local
 
+# Backup files
+*.bak
+*-backup.*
+*.backup
+
+# Debug and benchmark files
+*debug*.py
+*benchmark*.py
+
+# Optimization results
+optimization_results.json
+
 # Keep empty directories
 !**/.gitkeep
