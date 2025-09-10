@@ -1,0 +1,34 @@
+# Sales Toolkit Requirements
+# Chilean E-commerce Consulting Tools
+
+# Core dependencies
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# PDF generation
+reportlab>=4.0.0
+
+# PowerPoint generation  
+python-pptx>=0.6.21
+
+# Excel support
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+
+# CLI interface
+rich>=13.0.0
+click>=8.1.0
+
+# Data visualization (optional, for enhanced reports)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Web framework (if using web interface)
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# Additional utilities
+python-dateutil>=2.8.0
+dataclasses-json>=0.6.0

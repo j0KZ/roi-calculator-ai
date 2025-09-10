@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Comparison View - E-commerce ROI Calculator{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        .comparison-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .calculation-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .calculation-checkbox {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .calculation-checkbox:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+        }
+
+        .calculation-checkbox.selected {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .comparison-header {
+            background: var(--gradient-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .company-column {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 400px;
+        }
+
+        .company-header {
+            background: var(--gradient-gold);
+            color: var(--primary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: -20px -20px 20px -20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .metric-row:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(3px);
+        }
+
+        .metric-label {
+            font-weight: 300;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .metric-difference {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 15px;
+            margin-left: 10px;
+        }
+
+        .difference-better {
+            background: rgba(0, 200, 83, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .difference-worse {
+            background: rgba(255, 23, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .difference-neutral {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .best-badge {
+            background: var(--gradient-gold);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table .table {
+            margin-bottom: 0;
+            color: var(--text-primary);
+        }
+
+        .comparison-table .table th {
+            background: var(--gradient-dark);
+            color: var(--accent);
+            border-color: var(--border-color);
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .comparison-table .table td {
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            height: 400px;
+            position: relative;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .selection-counter {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-left: 15px;
+        }
+
+        .comparison-charts {
+            display: none;
+        }
+
+        .comparison-charts.active {
+            display: block;
+        }
+
+        .arrow-icon {
+            font-size: 1.2rem;
+            margin-left: 8px;
+        }
+
+        .arrow-up {
+            color: var(--success);
+        }
+
+        .arrow-down {
+            color: var(--danger);
+        }
+
+        .arrow-equal {
+            color: var(--text-muted);
+        }
+
+        .roi-highlight {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .company-column {
+                margin-bottom: 30px;
+            }
+            
+            .comparison-header {
+                padding: 20px 15px;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 15px;
+            }
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="hero-section text-center p-4 mb-4">
+                    <h1 class="display-4">Comparison View</h1>
+                    <p class="lead">Compare multiple ROI calculations side-by-side</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculation Selector -->
+        <div class="calculation-selector">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-double me-2"></i>
+                    Select Calculations to Compare
+                </h5>
+                <div>
+                    <span id="selectionCounter" class="selection-counter">0 / 3 selected</span>
+                    <button class="btn btn-success ms-3" onclick="loadComparison()" id="compareBtn" disabled>
+                        <i class="fas fa-balance-scale"></i> Compare Selected
+                    </button>
+                </div>
+            </div>
+            
+            <div id="calculationsList">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Loading saved calculations...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Results -->
+        <div id="comparisonResults" style="display: none;">
+            <!-- Comparison Header -->
+            <div class="comparison-header">
+                <h3><i class="fas fa-chart-bar me-2"></i>ROI Comparison Results</h3>
+                <p class="text-muted mb-0">Side-by-side analysis of selected calculations</p>
+            </div>
+
+            <!-- Company Columns -->
+            <div class="row" id="companyColumns">
+                <!-- Dynamic company columns will be inserted here -->
+            </div>
+
+            <!-- Detailed Comparison Table -->
+            <div class="comparison-container">
+                <h5 class="mb-4"><i class="fas fa-table me-2"></i>Detailed Metrics Comparison</h5>
+                <div class="comparison-table">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="comparisonTable">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <!-- Dynamic columns for each company -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic comparison rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Charts -->
+            <div class="row comparison-charts active" id="visualCharts">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-chart-pie me-2"></i>ROI Comparison
+                        </h6>
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-chart-bar me-2"></i>Annual Savings Comparison
+                        </h6>
+                        <canvas id="savingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row comparison-charts active">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-clock me-2"></i>Payback Period Comparison
+                        </h6>
+                        <canvas id="paybackChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-dollar-sign me-2"></i>Net Present Value
+                        </h6>
+                        <canvas id="npvChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+            <i class="fas fa-balance-scale"></i>
+            <h3>No Comparisons Yet</h3>
+            <p>Select 2-3 calculations above to start comparing their ROI metrics.</p>
+            <a href="/history" class="btn btn-primary mt-3">
+                <i class="fas fa-history"></i> Browse Saved Calculations
+            </a>
+        </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

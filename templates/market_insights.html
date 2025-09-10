@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+
+{% block title %}Market Insights - E-commerce ROI Calculator{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+<style>
+        .market-insights-container {
+            padding: 2rem 0;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .insight-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-gold);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .insight-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .insight-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .insight-card h3 i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .metric-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: var(--gradient-subtle);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .metric-display:hover {
+            background: var(--tertiary);
+            transform: translateX(5px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 200;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .metric-unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .growth-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .growth-positive {
+            color: var(--success);
+        }
+
+        .growth-negative {
+            color: var(--danger);
+        }
+
+        .growth-neutral {
+            color: var(--text-muted);
+        }
+
+        .benchmark-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .benchmark-section .card-header {
+            background: var(--gradient-dark);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--accent);
+            padding: 1.5rem 2rem;
+        }
+
+        .benchmark-section .card-body {
+            padding: 2rem;
+        }
+
+        .benchmark-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: end;
+        }
+
+        .benchmark-results {
+            display: none;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .percentile-gauge {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: var(--gradient-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .percentile-details {
+            background: var(--gradient-subtle);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        .percentile-details h3, .percentile-details h4 {
+            color: var(--text-primary);
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .percentile-details p, .percentile-details li {
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+        }
+
+        .data-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            font-weight: 300;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .form-group input, .form-group select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            background: var(--input-bg);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            outline: none;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-connected {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-error {
+            background: rgba(255, 23, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .update-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--gradient-subtle);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 23, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-left: 4px solid var(--danger);
+            padding: 1.5rem;
+            border-radius: 0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-breadcrumb {
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-breadcrumb a:hover {
+            color: var(--accent-hover);
+        }
+
+        @media (max-width: 768px) {
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .benchmark-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .benchmark-results {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-controls {
+                flex-direction: column;
+            }
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+        <div class="nav-breadcrumb">
+            <a href="/">&larr; Back to Calculator</a>
+        </div>
+
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="hero-section text-center p-4 mb-4">
+                    <h1 class="display-4">Market Insights</h1>
+                    <p class="lead">Real-time e-commerce market data powered by Federal Reserve Economic Data (FRED)</p>
+                </div>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Error loading market data:</strong> {{ error }}
+            <br><small>Check your FRED API key and internet connection</small>
+        </div>
+        {% endif %}
+
+        <div class="update-controls">
+            <div>
+                <span id="api-status" class="status-indicator status-error">
+                    <i class="fas fa-times-circle"></i>
+                    API Status: Checking...
+                </span>
+            </div>
+            <div>
+                <button id="update-data-btn" class="btn btn-success me-2" onclick="updateMarketData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Update Data
+                </button>
+                <button id="test-api-btn" class="btn btn-secondary" onclick="testFREDAPI()">
+                    <i class="fas fa-flask"></i>
+                    Test API
+                </button>
+            </div>
+        </div>
+
+        <div class="insights-grid" id="market-overview">
+            <div class="insight-card">
+                <h3><i class="fas fa-shopping-cart"></i> E-Commerce Sales</h3>
+                <div id="ecom-sales-data" class="loading">
+                    <i class="fas fa-spinner"></i> 
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <h3><i class="fas fa-percentage"></i> E-Commerce Share</h3>
+                <div id="ecom-share-data" class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <h3><i class="fas fa-store"></i> Retail Sales</h3>
+                <div id="retail-sales-data" class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <h3><i class="fas fa-users"></i> Retail Employment</h3>
+                <div id="employment-data" class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card benchmark-section">
+            <div class="card-header">
+                <h5><i class="fas fa-bullseye me-2"></i>ROI Benchmarking</h5>
+                <p class="mb-0 text-muted">Compare your ROI against industry benchmarks and get percentile rankings</p>
+            </div>
+            <div class="card-body">
+                <div class="benchmark-form">
+                    <div class="form-group">
+                        <label for="roi-input">Your ROI (%)</label>
+                        <input type="number" id="roi-input" placeholder="e.g., 15.5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="industry-select">Industry</label>
+                        <select id="industry-select">
+                            <option value="ecommerce">E-Commerce</option>
+                            <option value="retail">Retail</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-success" onclick="calculateBenchmark()">
+                            <i class="fas fa-calculator"></i>
+                            Benchmark
+                        </button>
+                    </div>
+                </div>
+
+                <div id="benchmark-results" class="benchmark-results">
+                    <div>
+                        <div class="percentile-gauge" id="percentile-gauge"></div>
+                    </div>
+                    <div class="percentile-details" id="benchmark-details">
+                        <!-- Benchmark results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-area me-2"></i>Market Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="data-controls">
+                    <div class="form-group">
+                        <label for="chart-series">Data Series</label>
+                        <select id="chart-series" onchange="updateChart()">
+                            <option value="ECOMSA">E-Commerce Sales</option>
+                            <option value="ECOMPCTSA">E-Commerce Percentage</option>
+                            <option value="RSXFS">Retail Sales</option>
+                            <option value="CES4200000001">Retail Employment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="chart-period">Time Period</label>
+                        <select id="chart-period" onchange="updateChart()">
+                            <option value="365">Last Year</option>
+                            <option value="730">Last 2 Years</option>
+                            <option value="1095">Last 3 Years</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentChart = null;
+        
+        // Test FRED API connection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            testFREDAPI();
+            loadMarketOverview();
+        });
+        
+        async function testFREDAPI() {
+            const statusElement = document.getElementById('api-status');
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            statusElement.className = 'status-indicator';
+            
+            try {
+                const response = await fetch('/api/fred-test');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    statusElement.innerHTML = '<i class="fas fa-check-circle"></i> API Connected';
+                    statusElement.className = 'status-indicator status-connected';
+                } else {
+                    statusElement.innerHTML = '<i class="fas fa-times-circle"></i> API Error';
+                    statusElement.className = 'status-indicator status-error';
+                }
+            } catch (error) {
+                statusElement.innerHTML = '<i class="fas fa-times-circle"></i> Connection Failed';
+                statusElement.className = 'status-indicator status-error';
+            }
+        }
+        
+        async function updateMarketData() {
+            const button = document.getElementById('update-data-btn');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/market-data/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Market data updated successfully!', 'success');
+                    loadMarketOverview();
+                } else {
+                    showToast('Error updating data: ' + result.error, 'danger');
+                }
+            } catch (error) {
+                showToast('Error updating data: ' + error.message, 'danger');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function loadMarketOverview() {
+            try {
+                const response = await fetch('/api/market-overview');
+                const result = await response.json();
+                
+                if (result.success && result.overview) {
+                    displayOverviewData(result.overview);
+                }
+            } catch (error) {
+                console.error('Error loading market overview:', error);
+            }
+        }
+        
+        function displayOverviewData(overview) {
+            const seriesMapping = {
+                'ECOMSA': 'ecom-sales-data',
+                'ECOMPCTSA': 'ecom-share-data', 
+                'RSXFS': 'retail-sales-data',
+                'CES4200000001': 'employment-data'
+            };
+            
+            for (const [seriesId, elementId] of Object.entries(seriesMapping)) {
+                const element = document.getElementById(elementId);
+                const data = overview[seriesId];
+                
+                if (data) {
+                    element.innerHTML = generateMetricDisplay(data);
+                } else {
+                    element.innerHTML = '<p class="text-muted">No data available</p>';
+                }
+            }
+        }
+        
+        function generateMetricDisplay(data) {
+            const growthRates = data.growth_rates || {};
+            const growth30d = growthRates['30d'];
+            
+            let growthHtml = '';
+            if (growth30d) {
+                const growthClass = growth30d.rate > 0 ? 'growth-positive' : 
+                                 growth30d.rate < 0 ? 'growth-negative' : 'growth-neutral';
+                const growthIcon = growth30d.rate > 0 ? 'fa-arrow-up' : 
+                                 growth30d.rate < 0 ? 'fa-arrow-down' : 'fa-minus';
+                
+                growthHtml = `
+                    <div class="growth-indicator ${growthClass}">
+                        <i class="fas ${growthIcon}"></i>
+                        ${Math.abs(growth30d.rate).toFixed(1)}% (30d)
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="metric-display">
+                    <div>
+                        <div class="metric-value">${formatValue(data.latest_value, data.units)}</div>
+                        <div class="metric-unit">${data.units}</div>
+                    </div>
+                    ${growthHtml}
+                </div>
+                <small class="text-muted">Latest: ${data.latest_date}</small>
+            `;
+        }
+        
+        function formatValue(value, units) {
+            if (units.includes('Percent')) {
+                return value.toFixed(1) + '%';
+            } else if (units.includes('Millions')) {
+                return '$' + (value/1000).toFixed(1) + 'B';
+            } else if (units.includes('Thousands')) {
+                return (value/1000).toFixed(1) + 'M';
+            }
+            return value.toLocaleString();
+        }
+        
+        async function calculateBenchmark() {
+            const roiValue = parseFloat(document.getElementById('roi-input').value);
+            const industry = document.getElementById('industry-select').value;
+            
+            if (isNaN(roiValue) || roiValue <= 0) {
+                showToast('Please enter a valid ROI percentage', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/roi-benchmark', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        roi_value: roiValue,
+                        industry: industry
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayBenchmarkResults(result.benchmarks);
+                } else {
+                    showToast('Error calculating benchmark: ' + result.error, 'danger');
+                }
+            } catch (error) {
+                showToast('Error calculating benchmark: ' + error.message, 'danger');
+            }
+        }
+        
+        function displayBenchmarkResults(benchmarks) {
+            const resultsDiv = document.getElementById('benchmark-results');
+            const detailsDiv = document.getElementById('benchmark-details');
+            
+            // Create percentile gauge
+            const gauge = document.getElementById('percentile-gauge');
+            gauge.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; font-weight: 200; color: var(--accent); letter-spacing: 1px;">
+                        ${benchmarks.percentile.toFixed(0)}th
+                    </div>
+                    <div style="font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem;">
+                        Percentile
+                    </div>
+                    <div style="font-size: 1.2rem; font-weight: 300; color: var(--text-primary); margin-top: 1rem; letter-spacing: 1px;">
+                        ${benchmarks.rating}
+                    </div>
+                </div>
+            `;
+            
+            // Create details
+            detailsDiv.innerHTML = `
+                <h3>Benchmark Analysis</h3>
+                <p><strong>Your ROI:</strong> ${benchmarks.roi_value}%</p>
+                <p><strong>Industry:</strong> ${benchmarks.industry}</p>
+                <p><strong>Performance:</strong> ${benchmarks.rating} (${benchmarks.percentile.toFixed(1)}th percentile)</p>
+                
+                <h4>Industry Averages</h4>
+                <ul>
+                    <li>Excellent: ${benchmarks.industry_averages.excellent}%+</li>
+                    <li>Good: ${benchmarks.industry_averages.good}%+</li>
+                    <li>Average: ${benchmarks.industry_averages.average}%</li>
+                    <li>Below Average: ${benchmarks.industry_averages.below_average}%</li>
+                </ul>
+                
+                <h4>Market Context</h4>
+                <ul>
+                    <li>E-commerce Growth (90d): ${benchmarks.market_context.ecommerce_growth_90d.toFixed(1)}%</li>
+                    <li>E-commerce Growth (1yr): ${benchmarks.market_context.ecommerce_growth_365d.toFixed(1)}%</li>
+                    <li>Retail Growth (90d): ${benchmarks.market_context.retail_growth_90d.toFixed(1)}%</li>
+                </ul>
+            `;
+            
+            resultsDiv.style.display = 'grid';
+        }
+        
+        async function updateChart() {
+            const seriesId = document.getElementById('chart-series').value;
+            const days = parseInt(document.getElementById('chart-period').value);
+            
+            try {
+                const response = await fetch(`/api/market-data/${seriesId}?days=${days}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderChart(result.data, seriesId);
+                }
+            } catch (error) {
+                console.error('Error updating chart:', error);
+            }
+        }
+        
+        function renderChart(data, seriesId) {
+            const ctx = document.getElementById('trend-chart');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            // Sort data by date
+            data.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: data[0]?.series_title || seriesId,
+                        data: data.map(d => d.value),
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#d4af37',
+                        pointBorderColor: '#d4af37',
+                        pointHoverBackgroundColor: '#f4e4bc',
+                        pointHoverBorderColor: '#d4af37'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    family: 'Inter',
+                                    weight: '300'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                parser: 'YYYY-MM-DD'
+                            },
+                            grid: {
+                                color: '#333333'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                font: {
+                                    family: 'Inter',
+                                    weight: '300'
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: '#333333'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                font: {
+                                    family: 'Inter',
+                                    weight: '300'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Load initial chart
+        setTimeout(updateChart, 2000);
+    </script>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Break-Even Analysis - ROI Calculator{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="hero-section text-center p-4 mb-4">
+                    <h1 class="display-4">Break-Even Analysis</h1>
+                    <p class="lead">Calculate when your investment will start generating profit</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-calculator me-2"></i>Break-Even Parameters</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="fixedCosts" class="form-label">Fixed Costs ($)</label>
+                        <input type="number" class="form-control" id="fixedCosts" placeholder="10000" step="100">
+                        <small class="form-text text-muted">One-time costs that don't vary with sales</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="variableCostPerUnit" class="form-label">Variable Cost per Unit ($)</label>
+                        <input type="number" class="form-control" id="variableCostPerUnit" placeholder="25" step="0.01">
+                        <small class="form-text text-muted">Cost that varies with each unit sold</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="pricePerUnit" class="form-label">Price per Unit ($)</label>
+                        <input type="number" class="form-control" id="pricePerUnit" placeholder="50" step="0.01">
+                        <small class="form-text text-muted">Selling price per unit</small>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary btn-lg me-2" id="calculateBtn">
+                        <i class="fas fa-chart-line me-1"></i>Calculate Break-Even
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="loadExampleData()">
+                        <i class="fas fa-example me-1"></i>Load Example
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let currentData = null;
+        
+        document.getElementById('calculateBtn').addEventListener('click', async () => {
+            const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
+            const variableCostPerUnit = parseFloat(document.getElementById('variableCostPerUnit').value) || 0;
+            const pricePerUnit = parseFloat(document.getElementById('pricePerUnit').value) || 0;
+            
+            if (!fixedCosts || !variableCostPerUnit || !pricePerUnit) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (pricePerUnit <= variableCostPerUnit) {
+                alert('Price per unit must be greater than variable cost per unit');
+                return;
+            }
+            
+            const contributionMargin = pricePerUnit - variableCostPerUnit;
+            const breakEvenPoint = Math.ceil(fixedCosts / contributionMargin);
+            const breakEvenRevenue = breakEvenPoint * pricePerUnit;
+            
+            currentData = {
+                fixedCosts,
+                variableCostPerUnit,
+                pricePerUnit,
+                contributionMargin,
+                breakEvenPoint,
+                breakEvenRevenue
+            };
+            
+            displayResults();
+            createChart();
+        });
+        
+        function displayResults() {
+            const resultsHtml = `
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-chart-line"></i> Break-Even Analysis Results</h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Contribution Margin per Unit:</strong> $${currentData.contributionMargin.toFixed(2)}</p>
+                            <p><strong>Break-Even Point:</strong> ${currentData.breakEvenPoint.toLocaleString()} units</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Break-Even Revenue:</strong> $${currentData.breakEvenRevenue.toLocaleString()}</p>
+                            <p><strong>Contribution Margin Ratio:</strong> ${((currentData.contributionMargin / currentData.pricePerUnit) * 100).toFixed(2)}%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Break-Even Chart</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="breakEvenChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>Key Insights</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success"></i> You need to sell ${currentData.breakEvenPoint.toLocaleString()} units to break even</li>
+                                    <li><i class="fas fa-dollar-sign text-primary"></i> Each unit contributes $${currentData.contributionMargin.toFixed(2)} to fixed costs</li>
+                                    <li><i class="fas fa-chart-line text-info"></i> Once you exceed ${currentData.breakEvenPoint.toLocaleString()} units, each additional unit generates $${currentData.contributionMargin.toFixed(2)} in profit</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHtml;
+        }
+        
+        function createChart() {
+            const ctx = document.getElementById('breakEvenChart').getContext('2d');
+            
+            // Generate data points
+            const maxUnits = Math.ceil(currentData.breakEvenPoint * 2);
+            const units = [];
+            const totalCosts = [];
+            const totalRevenue = [];
+            
+            for (let i = 0; i <= maxUnits; i += Math.ceil(maxUnits / 20)) {
+                units.push(i);
+                totalCosts.push(currentData.fixedCosts + (i * currentData.variableCostPerUnit));
+                totalRevenue.push(i * currentData.pricePerUnit);
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: units,
+                    datasets: [{
+                        label: 'Total Costs',
+                        data: totalCosts,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1
+                    }, {
+                        label: 'Total Revenue',
+                        data: totalRevenue,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        intersect: false,
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Break-Even Analysis Chart'
+                        },
+                        tooltip: {
+                            mode: 'index'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Units'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Load example data
+        function loadExampleData() {
+            document.getElementById('fixedCosts').value = '10000';
+            document.getElementById('variableCostPerUnit').value = '25';
+            document.getElementById('pricePerUnit').value = '50';
+        }
+    </script>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

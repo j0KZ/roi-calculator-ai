@@ -1,0 +1,139 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+roi_calculator.db
+
+# Logs
+*.log
+logs/
+app.log
+sales_toolkit_debug.log
+
+# Cache
+cache/
+.streamlit_pid
+__pycache__/
+.pytest_cache/
+.cache/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Reports and outputs
+reports/*.pdf
+reports/*.pptx
+reports/*.xlsx
+exports/
+
+# Data files (keep structure, ignore content)
+data/history/*.json
+data/exchange_rates_cache.json
+data/*.json
+!data/.gitkeep
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
+
+# Package files
+*.tar.gz
+*.zip
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Streamlit
+.streamlit/secrets.toml
+.streamlit_pid
+
+# Node modules (if any frontend development)
+node_modules/
+
+# Sensitive information
+secrets.yaml
+credentials.json
+*.pem
+*.key
+*.crt
+
+# ML Model files (large files)
+models/*.pkl
+models/*.joblib
+models/*.h5
+*.model
+
+# Alembic local config
+alembic.ini.local
+
+# Keep empty directories
+!**/.gitkeep

@@ -1,0 +1,233 @@
+{
+  "tax_jurisdictions": {
+    "US": {
+      "name": "United States",
+      "tax_type": "Sales Tax",
+      "description": "State and local sales tax rates",
+      "default_rate": 0.0875,
+      "notes": "Combined state and local average rate",
+      "states": {
+        "AL": { "rate": 0.0913, "name": "Alabama" },
+        "AK": { "rate": 0.0176, "name": "Alaska" },
+        "AZ": { "rate": 0.0837, "name": "Arizona" },
+        "AR": { "rate": 0.0947, "name": "Arkansas" },
+        "CA": { "rate": 0.0857, "name": "California" },
+        "CO": { "rate": 0.0769, "name": "Colorado" },
+        "CT": { "rate": 0.0635, "name": "Connecticut" },
+        "DE": { "rate": 0.0000, "name": "Delaware" },
+        "FL": { "rate": 0.0701, "name": "Florida" },
+        "GA": { "rate": 0.0732, "name": "Georgia" },
+        "HI": { "rate": 0.0444, "name": "Hawaii" },
+        "ID": { "rate": 0.0603, "name": "Idaho" },
+        "IL": { "rate": 0.0882, "name": "Illinois" },
+        "IN": { "rate": 0.0700, "name": "Indiana" },
+        "IA": { "rate": 0.0694, "name": "Iowa" },
+        "KS": { "rate": 0.0865, "name": "Kansas" },
+        "KY": { "rate": 0.0600, "name": "Kentucky" },
+        "LA": { "rate": 0.0907, "name": "Louisiana" },
+        "ME": { "rate": 0.0550, "name": "Maine" },
+        "MD": { "rate": 0.0600, "name": "Maryland" },
+        "MA": { "rate": 0.0625, "name": "Massachusetts" },
+        "MI": { "rate": 0.0600, "name": "Michigan" },
+        "MN": { "rate": 0.0738, "name": "Minnesota" },
+        "MS": { "rate": 0.0707, "name": "Mississippi" },
+        "MO": { "rate": 0.0823, "name": "Missouri" },
+        "MT": { "rate": 0.0000, "name": "Montana" },
+        "NE": { "rate": 0.0691, "name": "Nebraska" },
+        "NV": { "rate": 0.0827, "name": "Nevada" },
+        "NH": { "rate": 0.0000, "name": "New Hampshire" },
+        "NJ": { "rate": 0.0663, "name": "New Jersey" },
+        "NM": { "rate": 0.0512, "name": "New Mexico" },
+        "NY": { "rate": 0.0804, "name": "New York" },
+        "NC": { "rate": 0.0695, "name": "North Carolina" },
+        "ND": { "rate": 0.0695, "name": "North Dakota" },
+        "OH": { "rate": 0.0723, "name": "Ohio" },
+        "OK": { "rate": 0.0891, "name": "Oklahoma" },
+        "OR": { "rate": 0.0000, "name": "Oregon" },
+        "PA": { "rate": 0.0634, "name": "Pennsylvania" },
+        "RI": { "rate": 0.0700, "name": "Rhode Island" },
+        "SC": { "rate": 0.0728, "name": "South Carolina" },
+        "SD": { "rate": 0.0645, "name": "South Dakota" },
+        "TN": { "rate": 0.0947, "name": "Tennessee" },
+        "TX": { "rate": 0.0820, "name": "Texas" },
+        "UT": { "rate": 0.0719, "name": "Utah" },
+        "VT": { "rate": 0.0624, "name": "Vermont" },
+        "VA": { "rate": 0.0573, "name": "Virginia" },
+        "WA": { "rate": 0.0929, "name": "Washington" },
+        "WV": { "rate": 0.0659, "name": "West Virginia" },
+        "WI": { "rate": 0.0543, "name": "Wisconsin" },
+        "WY": { "rate": 0.0546, "name": "Wyoming" }
+      }
+    },
+    "EU": {
+      "name": "European Union",
+      "tax_type": "VAT",
+      "description": "Value Added Tax rates across EU member states",
+      "default_rate": 0.21,
+      "notes": "Standard VAT rates as of 2024",
+      "countries": {
+        "AT": { "rate": 0.20, "name": "Austria" },
+        "BE": { "rate": 0.21, "name": "Belgium" },
+        "BG": { "rate": 0.20, "name": "Bulgaria" },
+        "CY": { "rate": 0.19, "name": "Cyprus" },
+        "CZ": { "rate": 0.21, "name": "Czech Republic" },
+        "DE": { "rate": 0.19, "name": "Germany" },
+        "DK": { "rate": 0.25, "name": "Denmark" },
+        "EE": { "rate": 0.20, "name": "Estonia" },
+        "ES": { "rate": 0.21, "name": "Spain" },
+        "FI": { "rate": 0.24, "name": "Finland" },
+        "FR": { "rate": 0.20, "name": "France" },
+        "GR": { "rate": 0.24, "name": "Greece" },
+        "HU": { "rate": 0.27, "name": "Hungary" },
+        "IE": { "rate": 0.23, "name": "Ireland" },
+        "IT": { "rate": 0.22, "name": "Italy" },
+        "LV": { "rate": 0.21, "name": "Latvia" },
+        "LT": { "rate": 0.21, "name": "Lithuania" },
+        "LU": { "rate": 0.17, "name": "Luxembourg" },
+        "MT": { "rate": 0.18, "name": "Malta" },
+        "NL": { "rate": 0.21, "name": "Netherlands" },
+        "PL": { "rate": 0.23, "name": "Poland" },
+        "PT": { "rate": 0.23, "name": "Portugal" },
+        "RO": { "rate": 0.19, "name": "Romania" },
+        "SK": { "rate": 0.20, "name": "Slovakia" },
+        "SI": { "rate": 0.22, "name": "Slovenia" },
+        "SE": { "rate": 0.25, "name": "Sweden" },
+        "HR": { "rate": 0.25, "name": "Croatia" }
+      }
+    },
+    "CL": {
+      "name": "Chile",
+      "tax_type": "IVA",
+      "description": "Impuesto al Valor Agregado (Value Added Tax)",
+      "default_rate": 0.19,
+      "notes": "Standard IVA rate throughout Chile",
+      "regions": {
+        "national": { "rate": 0.19, "name": "National Rate" },
+        "zona_franca": { "rate": 0.0, "name": "Free Trade Zone" }
+      }
+    },
+    "BR": {
+      "name": "Brazil",
+      "tax_type": "ICMS/IPI",
+      "description": "State consumption tax (ICMS) and federal excise tax (IPI)",
+      "default_rate": 0.18,
+      "notes": "Average ICMS rate varies by state",
+      "states": {
+        "SP": { "rate": 0.18, "name": "São Paulo" },
+        "RJ": { "rate": 0.20, "name": "Rio de Janeiro" },
+        "MG": { "rate": 0.18, "name": "Minas Gerais" },
+        "RS": { "rate": 0.18, "name": "Rio Grande do Sul" },
+        "PR": { "rate": 0.18, "name": "Paraná" },
+        "SC": { "rate": 0.17, "name": "Santa Catarina" },
+        "BA": { "rate": 0.18, "name": "Bahia" },
+        "GO": { "rate": 0.17, "name": "Goiás" },
+        "PE": { "rate": 0.18, "name": "Pernambuco" },
+        "CE": { "rate": 0.18, "name": "Ceará" }
+      }
+    },
+    "MX": {
+      "name": "Mexico",
+      "tax_type": "IVA",
+      "description": "Impuesto al Valor Agregado (Value Added Tax)",
+      "default_rate": 0.16,
+      "notes": "Reduced rate in border regions",
+      "regions": {
+        "national": { "rate": 0.16, "name": "National Rate" },
+        "frontera": { "rate": 0.08, "name": "Border Region" }
+      }
+    },
+    "AR": {
+      "name": "Argentina",
+      "tax_type": "IVA",
+      "description": "Impuesto al Valor Agregado with different rates by category",
+      "default_rate": 0.21,
+      "notes": "Different rates for different product categories",
+      "categories": {
+        "general": { "rate": 0.21, "name": "General Rate" },
+        "basic_goods": { "rate": 0.105, "name": "Basic Necessities" },
+        "medicines": { "rate": 0.0, "name": "Medicines and Medical Equipment" }
+      }
+    },
+    "CA": {
+      "name": "Canada",
+      "tax_type": "GST/HST",
+      "description": "Goods and Services Tax / Harmonized Sales Tax",
+      "default_rate": 0.13,
+      "notes": "Combined GST and provincial rates",
+      "provinces": {
+        "AB": { "rate": 0.05, "name": "Alberta (GST only)" },
+        "BC": { "rate": 0.12, "name": "British Columbia" },
+        "MB": { "rate": 0.12, "name": "Manitoba" },
+        "NB": { "rate": 0.15, "name": "New Brunswick (HST)" },
+        "NL": { "rate": 0.15, "name": "Newfoundland and Labrador (HST)" },
+        "NT": { "rate": 0.05, "name": "Northwest Territories (GST only)" },
+        "NS": { "rate": 0.15, "name": "Nova Scotia (HST)" },
+        "NU": { "rate": 0.05, "name": "Nunavut (GST only)" },
+        "ON": { "rate": 0.13, "name": "Ontario (HST)" },
+        "PE": { "rate": 0.15, "name": "Prince Edward Island (HST)" },
+        "QC": { "rate": 0.14975, "name": "Quebec" },
+        "SK": { "rate": 0.11, "name": "Saskatchewan" },
+        "YT": { "rate": 0.05, "name": "Yukon (GST only)" }
+      }
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "tax_type": "VAT",
+      "description": "Value Added Tax with standard, reduced, and zero rates",
+      "default_rate": 0.20,
+      "notes": "Different rates apply to different goods and services",
+      "rates": {
+        "standard": { "rate": 0.20, "name": "Standard Rate" },
+        "reduced": { "rate": 0.05, "name": "Reduced Rate" },
+        "zero": { "rate": 0.0, "name": "Zero Rate" }
+      }
+    },
+    "AU": {
+      "name": "Australia",
+      "tax_type": "GST",
+      "description": "Goods and Services Tax",
+      "default_rate": 0.10,
+      "notes": "Uniform rate across Australia with some GST-free items",
+      "rates": {
+        "standard": { "rate": 0.10, "name": "Standard GST Rate" },
+        "gst_free": { "rate": 0.0, "name": "GST-Free Items" }
+      }
+    },
+    "JP": {
+      "name": "Japan",
+      "tax_type": "Consumption Tax",
+      "description": "Japanese consumption tax with standard and reduced rates",
+      "default_rate": 0.10,
+      "notes": "Reduced rate for food and beverages",
+      "rates": {
+        "standard": { "rate": 0.10, "name": "Standard Rate" },
+        "reduced": { "rate": 0.08, "name": "Reduced Rate (Food & Beverages)" }
+      }
+    },
+    "CN": {
+      "name": "China",
+      "tax_type": "VAT",
+      "description": "Value Added Tax with multiple rates",
+      "default_rate": 0.13,
+      "notes": "Different rates for different industries and services",
+      "rates": {
+        "standard": { "rate": 0.13, "name": "Standard Rate" },
+        "basic_goods": { "rate": 0.09, "name": "Basic Necessities" },
+        "services": { "rate": 0.06, "name": "Services" }
+      }
+    }
+  },
+  "configuration": {
+    "default_settings": {
+      "investment_deductible": true,
+      "savings_taxable": true,
+      "apply_to_profits": true
+    },
+    "calculation_notes": {
+      "investment_deduction": "When enabled, investment costs reduce taxable income, providing a tax benefit",
+      "savings_taxation": "Savings from operational improvements may be subject to taxation as increased profits",
+      "effective_rates": "Effective tax rates may vary based on business structure and local regulations"
+    },
+    "disclaimer": "Tax rates are subject to change. Consult local tax authorities or professionals for current rates and specific business situations."
+  }
+}

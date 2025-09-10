@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Proposal Generator - ROI Calculator{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #2E5BBA;
+        --secondary-color: #8FA4D3;
+        --accent-color: #D4AF37;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .main-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+
+    .header-section h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header-section p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .content-section {
+        padding: 40px 30px;
+    }
+
+    .proposal-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    .proposal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--accent-color), #B8860B);
+        color: white;
+        padding: 20px;
+        border: none;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 12px 30px;
+        font-weight: 500;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="main-container">
+        <div class="header-section">
+            <h1><i class="fas fa-file-contract me-3"></i>Proposal Generator</h1>
+            <p>Create professional business proposals from your ROI calculations</p>
+        </div>
+
+        <div class="content-section">
+            <!-- Input Section -->
+            <div class="proposal-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-edit me-2"></i>Proposal Details</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="proposalForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="client_name" class="form-label">Client Name</label>
+                                <input type="text" class="form-control" id="client_name" placeholder="Enter client name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="proposal_title" class="form-label">Proposal Title</label>
+                                <input type="text" class="form-control" id="proposal_title" placeholder="ROI Analysis Proposal">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="company_name" class="form-label">Your Company</label>
+                                <input type="text" class="form-control" id="company_name" placeholder="Your company name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_email" class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="contact_email" placeholder="contact@company.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="executive_summary" class="form-label">Executive Summary</label>
+                            <textarea class="form-control" id="executive_summary" rows="4" placeholder="Brief overview of the proposal..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="investment_amount" class="form-label">Investment Amount ($)</label>
+                                <input type="number" class="form-control" id="investment_amount" placeholder="50000" step="1000">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="expected_roi" class="form-label">Expected ROI (%)</label>
+                                <input type="number" class="form-control" id="expected_roi" placeholder="150" step="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="payback_period" class="form-label">Payback Period (months)</label>
+                                <input type="number" class="form-control" id="payback_period" placeholder="18" step="1">
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>Generate Proposal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" style="display: none;">
+                <div class="proposal-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt me-2"></i>Generated Proposal</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="proposalContent">
+                            <!-- Generated proposal content will appear here -->
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-success me-3" onclick="downloadProposal()">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="copyProposal()">
+                                <i class="fas fa-copy me-2"></i>Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('proposalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        generateProposal();
+    });
+
+    function generateProposal() {
+        // Get form data
+        const clientName = document.getElementById('client_name').value || 'Valued Client';
+        const proposalTitle = document.getElementById('proposal_title').value || 'ROI Analysis Proposal';
+        const companyName = document.getElementById('company_name').value || 'Your Company';
+        const contactEmail = document.getElementById('contact_email').value || 'contact@company.com';
+        const executiveSummary = document.getElementById('executive_summary').value || 'This proposal outlines the return on investment analysis for your business.';
+        const investmentAmount = document.getElementById('investment_amount').value || '50000';
+        const expectedRoi = document.getElementById('expected_roi').value || '150';
+        const paybackPeriod = document.getElementById('payback_period').value || '18';
+
+        // Calculate additional metrics
+        const monthlyReturn = (parseFloat(investmentAmount) * (parseFloat(expectedRoi) / 100)) / 12;
+        const annualRevenue = parseFloat(investmentAmount) * (parseFloat(expectedRoi) / 100);
+
+        // Generate proposal content
+        const proposalHTML = `
+            <div class="proposal-document">
+                <h2>${proposalTitle}</h2>
+                <p><strong>Prepared for:</strong> ${clientName}</p>
+                <p><strong>Prepared by:</strong> ${companyName}</p>
+                <p><strong>Contact:</strong> ${contactEmail}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <hr>
+                
+                <h3>Executive Summary</h3>
+                <p>${executiveSummary}</p>
+                
+                <h3>Investment Overview</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Initial Investment:</strong> $${parseInt(investmentAmount).toLocaleString()}</li>
+                            <li><strong>Expected ROI:</strong> ${expectedRoi}%</li>
+                            <li><strong>Payback Period:</strong> ${paybackPeriod} months</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Annual Revenue:</strong> $${Math.round(annualRevenue).toLocaleString()}</li>
+                            <li><strong>Monthly Return:</strong> $${Math.round(monthlyReturn).toLocaleString()}</li>
+                            <li><strong>Total Return:</strong> $${Math.round(parseFloat(investmentAmount) + annualRevenue).toLocaleString()}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3>Benefits</h3>
+                <ul>
+                    <li>Strong return on investment of ${expectedRoi}%</li>
+                    <li>Quick payback period of ${paybackPeriod} months</li>
+                    <li>Potential monthly returns of $${Math.round(monthlyReturn).toLocaleString()}</li>
+                    <li>Low risk with high reward potential</li>
+                </ul>
+                
+                <h3>Next Steps</h3>
+                <ol>
+                    <li>Review this proposal with your team</li>
+                    <li>Schedule a follow-up meeting to discuss details</li>
+                    <li>Finalize investment terms and timeline</li>
+                    <li>Begin implementation process</li>
+                </ol>
+                
+                <div class="mt-4 p-3 bg-light rounded">
+                    <p class="mb-0"><strong>Contact Information:</strong></p>
+                    <p>For questions about this proposal, please contact ${companyName} at ${contactEmail}</p>
+                </div>
+            </div>
+        `;
+
+        // Display the proposal
+        document.getElementById('proposalContent').innerHTML = proposalHTML;
+        document.getElementById('resultsSection').style.display = 'block';
+        
+        // Scroll to results
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function downloadProposal() {
+        // Create a simple PDF-like content
+        const content = document.getElementById('proposalContent').innerText;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'roi_proposal.txt';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function copyProposal() {
+        const content = document.getElementById('proposalContent').innerText;
+        navigator.clipboard.writeText(content).then(function() {
+            alert('Proposal copied to clipboard!');
+        });
+    }
+</script>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

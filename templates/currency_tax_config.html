@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Currency & Tax Configuration - ROI Calculator{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="hero-section text-center p-4 mb-4">
+                    <h1 class="display-4">Currency & Tax Configuration</h1>
+                    <p class="lead">Configure currency and tax settings for accurate calculations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-cog me-2"></i>Configuration Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h6>Currency Settings</h6>
+                        <div class="mb-3">
+                            <label for="baseCurrency" class="form-label">Base Currency</label>
+                            <select class="form-select" id="baseCurrency">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="AUD">AUD - Australian Dollar</option>
+                                <option value="JPY">JPY - Japanese Yen</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="displayCurrency" class="form-label">Display Currency</label>
+                            <select class="form-select" id="displayCurrency">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="AUD">AUD - Australian Dollar</option>
+                                <option value="JPY">JPY - Japanese Yen</option>
+                            </select>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="autoUpdateRates" checked>
+                            <label class="form-check-label" for="autoUpdateRates">
+                                Auto-update exchange rates
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <h6>Tax Settings</h6>
+                        <div class="mb-3">
+                            <label for="corporateTax" class="form-label">Corporate Tax Rate (%)</label>
+                            <input type="number" class="form-control" id="corporateTax" placeholder="25" step="0.1" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="salesTax" class="form-label">Sales Tax Rate (%)</label>
+                            <input type="number" class="form-control" id="salesTax" placeholder="10" step="0.1" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="depreciationMethod" class="form-label">Depreciation Method</label>
+                            <select class="form-select" id="depreciationMethod">
+                                <option value="straight-line">Straight-line</option>
+                                <option value="declining-balance">Declining Balance</option>
+                                <option value="sum-of-years">Sum of Years' Digits</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-success btn-lg me-2" onclick="saveConfiguration()">
+                        <i class="fas fa-save me-1"></i>Save Configuration
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="resetToDefaults()">
+                        <i class="fas fa-undo me-1"></i>Reset to Defaults
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exchange Rates Preview -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-exchange-alt me-2"></i>Current Exchange Rates</h5>
+            </div>
+            <div class="card-body">
+                <div id="exchangeRates" class="row">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading exchange rates...</span>
+                        </div>
+                        <p class="mt-2">Loading current exchange rates...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tax Calculation Preview -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-calculator me-2"></i>Tax Calculation Preview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="sampleRevenue" class="form-label">Sample Revenue</label>
+                            <input type="number" class="form-control" id="sampleRevenue" placeholder="100000" step="1000">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="sampleExpenses" class="form-label">Sample Expenses</label>
+                            <input type="number" class="form-control" id="sampleExpenses" placeholder="75000" step="1000">
+                        </div>
+                    </div>
+                </div>
+                <div id="taxPreview" class="alert alert-info" style="display: none;">
+                    <!-- Tax calculation preview will appear here -->
+                </div>
+                <button class="btn btn-outline-primary" onclick="calculateTaxPreview()">
+                    <i class="fas fa-calculator me-1"></i>Preview Tax Calculation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load configuration on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfiguration();
+            loadExchangeRates();
+        });
+
+        function loadConfiguration() {
+            // Load saved configuration from localStorage or use defaults
+            const config = JSON.parse(localStorage.getItem('roiTaxConfig')) || {
+                baseCurrency: 'USD',
+                displayCurrency: 'USD',
+                autoUpdateRates: true,
+                corporateTax: 25,
+                salesTax: 10,
+                depreciationMethod: 'straight-line'
+            };
+
+            document.getElementById('baseCurrency').value = config.baseCurrency;
+            document.getElementById('displayCurrency').value = config.displayCurrency;
+            document.getElementById('autoUpdateRates').checked = config.autoUpdateRates;
+            document.getElementById('corporateTax').value = config.corporateTax;
+            document.getElementById('salesTax').value = config.salesTax;
+            document.getElementById('depreciationMethod').value = config.depreciationMethod;
+        }
+
+        function saveConfiguration() {
+            const config = {
+                baseCurrency: document.getElementById('baseCurrency').value,
+                displayCurrency: document.getElementById('displayCurrency').value,
+                autoUpdateRates: document.getElementById('autoUpdateRates').checked,
+                corporateTax: parseFloat(document.getElementById('corporateTax').value) || 0,
+                salesTax: parseFloat(document.getElementById('salesTax').value) || 0,
+                depreciationMethod: document.getElementById('depreciationMethod').value
+            };
+
+            localStorage.setItem('roiTaxConfig', JSON.stringify(config));
+            
+            // Show success message
+            showToast('Configuration saved successfully!', 'success');
+        }
+
+        function resetToDefaults() {
+            document.getElementById('baseCurrency').value = 'USD';
+            document.getElementById('displayCurrency').value = 'USD';
+            document.getElementById('autoUpdateRates').checked = true;
+            document.getElementById('corporateTax').value = '25';
+            document.getElementById('salesTax').value = '10';
+            document.getElementById('depreciationMethod').value = 'straight-line';
+            
+            showToast('Settings reset to defaults', 'info');
+        }
+
+        function loadExchangeRates() {
+            // Simulate loading exchange rates
+            setTimeout(() => {
+                const rates = {
+                    'EUR': 0.85,
+                    'GBP': 0.73,
+                    'CAD': 1.25,
+                    'AUD': 1.35,
+                    'JPY': 110.50
+                };
+
+                let html = '';
+                for (const [currency, rate] of Object.entries(rates)) {
+                    html += `
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="text-center p-3 border rounded">
+                                <h6>${currency}</h6>
+                                <p class="mb-0">${rate}</p>
+                                <small class="text-muted">per USD</small>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('exchangeRates').innerHTML = html;
+            }, 1000);
+        }
+
+        function calculateTaxPreview() {
+            const revenue = parseFloat(document.getElementById('sampleRevenue').value) || 0;
+            const expenses = parseFloat(document.getElementById('sampleExpenses').value) || 0;
+            const corporateTax = parseFloat(document.getElementById('corporateTax').value) || 0;
+            const salesTax = parseFloat(document.getElementById('salesTax').value) || 0;
+
+            if (!revenue || !expenses) {
+                alert('Please enter sample revenue and expenses');
+                return;
+            }
+
+            const grossProfit = revenue - expenses;
+            const corporateTaxAmount = grossProfit * (corporateTax / 100);
+            const salesTaxAmount = revenue * (salesTax / 100);
+            const netProfit = grossProfit - corporateTaxAmount;
+
+            const previewHtml = `
+                <h6>Tax Calculation Breakdown</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Revenue:</strong> $${revenue.toLocaleString()}</p>
+                        <p><strong>Expenses:</strong> $${expenses.toLocaleString()}</p>
+                        <p><strong>Gross Profit:</strong> $${grossProfit.toLocaleString()}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Corporate Tax (${corporateTax}%):</strong> $${corporateTaxAmount.toLocaleString()}</p>
+                        <p><strong>Sales Tax (${salesTax}%):</strong> $${salesTaxAmount.toLocaleString()}</p>
+                        <p><strong>Net Profit:</strong> $${netProfit.toLocaleString()}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('taxPreview').innerHTML = previewHtml;
+            document.getElementById('taxPreview').style.display = 'block';
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

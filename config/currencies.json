@@ -1,0 +1,90 @@
+{
+  "supported_currencies": {
+    "USD": {
+      "name": "US Dollar",
+      "symbol": "$",
+      "code": "USD",
+      "decimal_places": 2,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    },
+    "EUR": {
+      "name": "Euro",
+      "symbol": "€",
+      "code": "EUR",
+      "decimal_places": 2,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    },
+    "CLP": {
+      "name": "Chilean Peso",
+      "symbol": "$",
+      "code": "CLP",
+      "decimal_places": 0,
+      "thousand_separator": ".",
+      "decimal_separator": ","
+    },
+    "GBP": {
+      "name": "British Pound",
+      "symbol": "£",
+      "code": "GBP",
+      "decimal_places": 2,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    },
+    "JPY": {
+      "name": "Japanese Yen",
+      "symbol": "¥",
+      "code": "JPY",
+      "decimal_places": 0,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    },
+    "CNY": {
+      "name": "Chinese Yuan",
+      "symbol": "¥",
+      "code": "CNY",
+      "decimal_places": 2,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    },
+    "BRL": {
+      "name": "Brazilian Real",
+      "symbol": "R$",
+      "code": "BRL",
+      "decimal_places": 2,
+      "thousand_separator": ".",
+      "decimal_separator": ","
+    },
+    "MXN": {
+      "name": "Mexican Peso",
+      "symbol": "$",
+      "code": "MXN",
+      "decimal_places": 2,
+      "thousand_separator": ",",
+      "decimal_separator": "."
+    }
+  },
+  "fallback_exchange_rates": {
+    "note": "These are fallback rates used when API is unavailable. Base currency: USD",
+    "last_updated": "2024-09-05",
+    "base": "USD",
+    "rates": {
+      "USD": 1.0,
+      "EUR": 0.85,
+      "CLP": 890.0,
+      "GBP": 0.73,
+      "JPY": 150.0,
+      "CNY": 7.3,
+      "BRL": 5.1,
+      "MXN": 17.2
+    }
+  },
+  "api_configuration": {
+    "primary_provider": "exchangerate-api.com",
+    "backup_provider": "fixer.io",
+    "update_frequency_hours": 1,
+    "cache_duration_minutes": 60,
+    "timeout_seconds": 10
+  }
+}

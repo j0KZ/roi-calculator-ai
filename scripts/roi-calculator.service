@@ -1,0 +1,43 @@
+[Unit]
+Description=ROI Calculator Web Application
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/roi-calculator
+Environment="PATH=/opt/roi-calculator/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/roi-calculator"
+Environment="STREAMLIT_PORT=8501"
+
+# Start command
+ExecStart=/opt/roi-calculator/venv/bin/python /opt/roi-calculator/scripts/process_manager.py monitor
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=200
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryLimit=2G
+CPUQuota=80%
+
+# Security hardening
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/roi-calculator/data /opt/roi-calculator/logs /opt/roi-calculator/cache
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=roi-calculator
+
+[Install]
+WantedBy=multi-user.target
